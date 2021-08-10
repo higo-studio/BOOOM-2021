@@ -7,13 +7,22 @@ public class bullet : MonoBehaviour
 {
     public float speed;
     public float damage = 10;
+    public float damegeSpeed = 5;
+    public GameObject blood;
+    Rigidbody rb;
+
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.tag == "Player")
         {
-            collision.transform.GetComponent<player>().hp -= damage;
-            collision.transform.GetComponent<player>().updatePlayerInfo();
+            if (rb.velocity.magnitude >= damegeSpeed)
+            {
+                collision.transform.GetComponent<player>().hp -= damage;
+                collision.transform.GetComponent<player>().updatePlayerInfo();
+                ContactPoint contact = collision.contacts[0];               
+                Instantiate(blood,contact.point,Quaternion.FromToRotation(Vector3.forward,contact.normal));
+            }
             Destroy(gameObject);            
         }
     }
@@ -25,6 +34,7 @@ public class bullet : MonoBehaviour
 
     private void Start()
     {
+        rb = transform.GetComponent<Rigidbody>();
         Invoke("autoDestory",20);
     }
 

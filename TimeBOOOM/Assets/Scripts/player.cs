@@ -28,7 +28,7 @@ public class player : MonoBehaviour
         transform.LookAt(new Vector3(enemy.transform.position.x, 1, enemy.transform.position.z));
         if(alive)
         rb.velocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * speed;
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             GameObject boomClone;
             boomClone = Instantiate(boom, transform.position, transform.rotation);
@@ -37,6 +37,7 @@ public class player : MonoBehaviour
         if(hp<=0)
         {
             alive = false;
+            updatePlayerInfo();
         }
     }
 
@@ -51,7 +52,7 @@ public class player : MonoBehaviour
         }   
         else
         {
-            rb.AddForce(Vector3.up*200);
+            //rb.AddForce(Vector3.up * 20);
             transform.GetComponent<BoxCollider>().enabled =false;
         }
     }
