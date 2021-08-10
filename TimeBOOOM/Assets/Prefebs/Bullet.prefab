@@ -255,3 +255,4 @@ MonoBehaviour:
   damage: 10
   damegeSpeed: 8
   blood: {fileID: 8721933363023408981, guid: c008522d84890c84ea0fc11e618afe88, type: 3}
+  bloodE: {fileID: 8721933363023408981, guid: 4e61684bc0a9be545a0d6b76c3c21dc0, type: 3}

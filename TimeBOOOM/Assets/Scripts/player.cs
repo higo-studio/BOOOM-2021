@@ -21,6 +21,7 @@ public class player : MonoBehaviour
     float booomValue;
     public float booomValueRecovery = 1;
     GameObject booom1, booom2, booom3;
+    public GameObject deathUI;
 
     bool alive = true;
 
@@ -78,6 +79,8 @@ public class player : MonoBehaviour
         {
             alive = false;
             updatePlayerHPInfo();
+            Time.timeScale = 0.3f;
+            deathUI.SetActive(true);
         }
 
         updatePlayerBOOOMInfo();
@@ -89,8 +92,6 @@ public class player : MonoBehaviour
         {
             HPUI.transform.GetChild(0).GetComponent<Image>().fillAmount = 
                 hp/maxhp;
-            HPUI.transform.GetChild(1).GetComponent<Text>().text = 
-                hp.ToString();
         }   
         else
         {
@@ -102,20 +103,18 @@ public class player : MonoBehaviour
     {
         BOOOMUI.transform.GetChild(0).GetComponent<Image>().fillAmount =
             booomValue / maxbooomValue;
-        BOOOMUI.transform.GetChild(6).GetComponent<Text>().text =
-            ((int)(booomValue/100)).ToString();
 
-        if ((int)(booomValue / 100) >= 3)
+        if (booomValue >= maxbooomValue)
             booom3.SetActive(true);
         else
             booom3.SetActive(false);
 
-        if ((int)(booomValue / 100) >= 2)
+        if (booomValue >= maxbooomValue / 3 * 2)
             booom2.SetActive(true);
         else
             booom2.SetActive(false);
 
-        if ((int)(booomValue / 100) >= 1)
+        if (booomValue >= maxbooomValue / 3)
             booom1.SetActive(true);
         else
             booom1.SetActive(false);

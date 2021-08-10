@@ -9,6 +9,7 @@ public class bullet : MonoBehaviour
     public float damage = 10;
     public float damegeSpeed = 5;
     public GameObject blood;
+    public GameObject bloodE;
     Rigidbody rb;
     GameObject light;
 
@@ -29,6 +30,9 @@ public class bullet : MonoBehaviour
         if (collision.transform.tag == "Enemy")
         {
             UnityEngine.Debug.Log("»÷ÖÐµÐÈË");
+            collision.transform.GetComponent<enemy>().hurt();
+            ContactPoint contact = collision.contacts[0];
+            Instantiate(bloodE, contact.point, Quaternion.FromToRotation(Vector3.forward, contact.normal));
             Destroy(gameObject);
         }
     }

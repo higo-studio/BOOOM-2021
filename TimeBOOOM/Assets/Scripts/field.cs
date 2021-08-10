@@ -1,12 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
 
 public class field : MonoBehaviour
 {
     public float rate = 10;
-    public GameObject cinemachine;
 
     private void Start()
     {
@@ -28,9 +26,9 @@ public class field : MonoBehaviour
         }
     }
 
+
     public void autoDestory()
     {
-
         Destroy(gameObject);
     }
 }
