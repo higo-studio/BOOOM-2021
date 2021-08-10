@@ -10,6 +10,7 @@ public class bullet : MonoBehaviour
     public float damegeSpeed = 5;
     public GameObject blood;
     Rigidbody rb;
+    GameObject light;
 
 
     private void OnCollisionEnter(Collision collision)
@@ -32,10 +33,18 @@ public class bullet : MonoBehaviour
         Destroy(gameObject);
     }
 
+    public void lightDestory()
+    {
+        Destroy(light);
+    }
+
     private void Start()
     {
         rb = transform.GetComponent<Rigidbody>();
+        light = transform.GetChild(1).gameObject;
         Invoke("autoDestory",20);
+        Invoke("lightDestory", 0.1f);
+
     }
 
 }

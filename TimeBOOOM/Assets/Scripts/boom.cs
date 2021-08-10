@@ -8,7 +8,7 @@ public class boom : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Invoke("explosion",3);
+        Invoke("explosion",2);
     }
 
     void explosion()

@@ -25,14 +25,32 @@ public class player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.LookAt(new Vector3(enemy.transform.position.x, 1, enemy.transform.position.z));
+
+        //transform.LookAt(new Vector3(enemy.transform.position.x, 1, enemy.transform.position.z));//朝向敌人
+
+        //朝向指针
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Physics.Raycast(ray,out hit);
+        transform.LookAt(new Vector3(hit.point.x, 1, hit.point.z));
+        
+
         if(alive)
-        rb.velocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * speed;
-        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            rb.velocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * speed;
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            Debug.DrawLine(transform.position, hit.point);
+        }
+
+        if (Input.GetMouseButtonUp(0))
         {
             GameObject boomClone;
             boomClone = Instantiate(boom, transform.position, transform.rotation);
-            //boomClone.GetComponent<Rigidbody>().velocity = transform.TransformDirection((Vector3.forward+Vector3.up) * boom.GetComponent<bullet>().speed);
+            boomClone.GetComponent<Rigidbody>().velocity =
+                transform.TransformDirection(Vector3.forward * 8);
         }
         if(hp<=0)
         {
