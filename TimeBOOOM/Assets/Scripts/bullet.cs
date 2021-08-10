@@ -20,11 +20,15 @@ public class bullet : MonoBehaviour
             if (rb.velocity.magnitude >= damegeSpeed)
             {
                 collision.transform.GetComponent<player>().hp -= damage;
-                collision.transform.GetComponent<player>().updatePlayerInfo();
+                collision.transform.GetComponent<player>().updatePlayerHPInfo();
                 ContactPoint contact = collision.contacts[0];               
                 Instantiate(blood,contact.point,Quaternion.FromToRotation(Vector3.forward,contact.normal));
-            }
-            Destroy(gameObject);            
+                Destroy(gameObject);
+            }                   
+        }
+        if (collision.transform.tag == "Enemy")
+        {
+            UnityEngine.Debug.Log("»÷ÖÐµÐÈË");
         }
     }
 

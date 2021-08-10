@@ -11,15 +11,22 @@ public class player : MonoBehaviour
     public float speed;
     public GameObject enemy;
     public GameObject boom;
-    public GameObject UI;
+    public GameObject HPUI;
+    public GameObject BOOOMUI;
     public float maxhp = 100;
     public float hp;
+    public float maxbooomValue = 300;
+    public float booomValue;
+    public float booomValueRecovery = 1;
+
     bool alive = true;
+
     // Start is called before the first frame update
     void Start()
     {
         rb = transform.GetComponent<Rigidbody>();     
-        hp = maxhp;  
+        hp = maxhp;
+        booomValue = maxbooomValue;
     }
 
     // Update is called once per frame
@@ -45,27 +52,30 @@ public class player : MonoBehaviour
             Debug.DrawLine(transform.position, hit.point);
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && booomValue >= 100)
         {
             GameObject boomClone;
             boomClone = Instantiate(boom, transform.position, transform.rotation);
             boomClone.GetComponent<Rigidbody>().velocity =
                 transform.TransformDirection(Vector3.forward * 8);
+            booomValue -= 100;
         }
         if(hp<=0)
         {
             alive = false;
-            updatePlayerInfo();
+            updatePlayerHPInfo();
         }
+
+        updatePlayerBOOOMInfo();
     }
 
-    public void updatePlayerInfo()
+    public void updatePlayerHPInfo()
     {   
         if(alive)
         {
-            UI.transform.GetChild(0).GetComponent<Image>().fillAmount = 
+            HPUI.transform.GetChild(0).GetComponent<Image>().fillAmount = 
                 hp/maxhp;
-            UI.transform.GetChild(1).GetComponent<Text>().text = 
+            HPUI.transform.GetChild(1).GetComponent<Text>().text = 
                 hp.ToString();
         }   
         else
@@ -73,5 +83,13 @@ public class player : MonoBehaviour
             //rb.AddForce(Vector3.up * 20);
             transform.GetComponent<BoxCollider>().enabled =false;
         }
+    }
+    public void updatePlayerBOOOMInfo()
+    {
+        BOOOMUI.transform.GetChild(0).GetComponent<Image>().fillAmount =
+            booomValue / maxbooomValue;
+        BOOOMUI.transform.GetChild(6).GetComponent<Text>().text =
+            ((int)(booomValue/100)).ToString();
+        if(booomValue<=maxbooomValue)booomValue += booomValueRecovery;
     }
 }

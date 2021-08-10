@@ -21,7 +21,7 @@ public class enemy : MonoBehaviour
     private void shoot()
     {
         GameObject bulletcClone;
-        bulletcClone = Instantiate(bullet,transform.position,transform.rotation);
+        bulletcClone = Instantiate(bullet,transform.position+ transform.TransformDirection(Vector3.forward), transform.rotation);
         bulletcClone.GetComponent<Rigidbody>().velocity = 
             transform.TransformDirection(Vector3.forward * bullet.GetComponent<bullet>().speed);
     }
