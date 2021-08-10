@@ -1,3 +1,5 @@
+using System;
+using System.Threading;
 using System.Reflection.Emit;
 using System.Net.Mime;
 using System.Collections;
@@ -15,9 +17,10 @@ public class player : MonoBehaviour
     public GameObject BOOOMUI;
     public float maxhp = 100;
     public float hp;
-    public float maxbooomValue = 300;
-    public float booomValue;
+    float maxbooomValue = 300;
+    float booomValue;
     public float booomValueRecovery = 1;
+    GameObject booom1, booom2, booom3;
 
     bool alive = true;
 
@@ -27,15 +30,22 @@ public class player : MonoBehaviour
         rb = transform.GetComponent<Rigidbody>();     
         hp = maxhp;
         booomValue = maxbooomValue;
+        booom1 = BOOOMUI.transform.GetChild(1).gameObject;
+        booom2 = BOOOMUI.transform.GetChild(2).gameObject;
+        booom3 = BOOOMUI.transform.GetChild(3).gameObject;
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        //è§’è‰²æœå‘æ•Œäºº
+        //transform.LookAt(new Vector3(
+        //enemy.transform.position.x,
+        //1,
+        //enemy.transform.position.z));
 
-        //transform.LookAt(new Vector3(enemy.transform.position.x, 1, enemy.transform.position.z));//³¯ÏòµÐÈË
-
-        //³¯ÏòÖ¸Õë
+        //è§’è‰²æœå‘å…‰æ ‡
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Physics.Raycast(ray,out hit);
@@ -44,7 +54,10 @@ public class player : MonoBehaviour
 
         if(alive)
         {
-            rb.velocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * speed;
+            rb.velocity = new Vector3(
+                Input.GetAxis("Horizontal"), 
+                0, 
+                Input.GetAxis("Vertical")) * speed;
         }
 
         if (Input.GetMouseButton(0))
@@ -55,7 +68,8 @@ public class player : MonoBehaviour
         if (Input.GetMouseButtonUp(0) && booomValue >= 100)
         {
             GameObject boomClone;
-            boomClone = Instantiate(boom, transform.position, transform.rotation);
+            boomClone = Instantiate(boom, transform.position, 
+                transform.rotation);
             boomClone.GetComponent<Rigidbody>().velocity =
                 transform.TransformDirection(Vector3.forward * 8);
             booomValue -= 100;
@@ -90,6 +104,23 @@ public class player : MonoBehaviour
             booomValue / maxbooomValue;
         BOOOMUI.transform.GetChild(6).GetComponent<Text>().text =
             ((int)(booomValue/100)).ToString();
-        if(booomValue<=maxbooomValue)booomValue += booomValueRecovery;
+
+        if ((int)(booomValue / 100) >= 3)
+            booom3.SetActive(true);
+        else
+            booom3.SetActive(false);
+
+        if ((int)(booomValue / 100) >= 2)
+            booom2.SetActive(true);
+        else
+            booom2.SetActive(false);
+
+        if ((int)(booomValue / 100) >= 1)
+            booom1.SetActive(true);
+        else
+            booom1.SetActive(false);
+
+        if (booomValue<=maxbooomValue)
+            booomValue += booomValueRecovery * Time.deltaTime;
     }
 }

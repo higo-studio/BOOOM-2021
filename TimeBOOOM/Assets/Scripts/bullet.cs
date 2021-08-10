@@ -29,6 +29,7 @@ public class bullet : MonoBehaviour
         if (collision.transform.tag == "Enemy")
         {
             UnityEngine.Debug.Log("»÷ÖÐµÐÈË");
+            Destroy(gameObject);
         }
     }
 
