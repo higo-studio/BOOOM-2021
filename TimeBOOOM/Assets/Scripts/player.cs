@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class player : MonoBehaviour
 {
@@ -22,12 +23,15 @@ public class player : MonoBehaviour
     public float booomValueRecovery = 1;
     GameObject booom1, booom2, booom3;
     public GameObject deathUI;
+    public AudioClip getShotSFX, shootSFX;
+    AudioSource audioSource;
 
     bool alive = true;
 
     // Start is called before the first frame update
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         rb = transform.GetComponent<Rigidbody>();     
         hp = maxhp;
         booomValue = maxbooomValue;
@@ -57,10 +61,19 @@ public class player : MonoBehaviour
 
         if(alive)
         {
-            rb.velocity = new Vector3(
-                Input.GetAxis("Horizontal"), 
-                0, 
-                Input.GetAxis("Vertical")) * speed;
+            if (Input.GetAxis("Horizontal") != 0 && Input.GetAxis("Vertical") != 0)
+            {
+                rb.velocity = new Vector3(
+                    Input.GetAxis("Horizontal"),
+                    0,
+                    Input.GetAxis("Vertical")) * speed * Mathf.Sqrt(2) / 2;
+            }
+            else
+                rb.velocity = new Vector3(
+                   Input.GetAxis("Horizontal"),
+                   0,
+                   Input.GetAxis("Vertical")) * speed;
+
         }
 
         if (Input.GetMouseButton(0))
@@ -75,6 +88,8 @@ public class player : MonoBehaviour
                 transform.rotation);
             boomClone.GetComponent<Rigidbody>().velocity =
                 transform.TransformDirection(Vector3.forward * 8);
+            audioSource.clip = shootSFX;
+            audioSource.Play();
             booomValue -= 100;
         }
         if(hp<=0)
@@ -82,10 +97,16 @@ public class player : MonoBehaviour
             alive = false;
             updatePlayerHPInfo();
             Time.timeScale = 0.3f;
+            audioSource.clip = getShotSFX;
+            audioSource.Play();
             deathUI.SetActive(true);
         }
 
         updatePlayerBOOOMInfo();
+        if (alive && Input.GetKeyDown(KeyCode.R))
+        {
+            SceneManager.LoadScene(0);
+        }
     }
 
     public void updatePlayerHPInfo()
@@ -94,6 +115,8 @@ public class player : MonoBehaviour
         {
             HPUI.transform.GetChild(0).GetComponent<Image>().fillAmount = 
                 hp/maxhp;
+            audioSource.clip = getShotSFX;
+            audioSource.Play();
         }   
         else
         {

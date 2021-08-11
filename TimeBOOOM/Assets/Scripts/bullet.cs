@@ -11,7 +11,7 @@ public class bullet : MonoBehaviour
     public GameObject blood;
     public GameObject bloodE;
     Rigidbody rb;
-    GameObject light;
+    GameObject bulletlight;
 
 
     private void OnCollisionEnter(Collision collision)
@@ -45,13 +45,13 @@ public class bullet : MonoBehaviour
 
     public void lightDestory()
     {
-        Destroy(light);
+        Destroy(bulletlight);
     }
 
     private void Start()
     {
         rb = transform.GetComponent<Rigidbody>();
-        light = transform.GetChild(1).gameObject;
+        bulletlight = transform.GetChild(1).gameObject;
         Invoke("autoDestory",20);
         Invoke("lightDestory", 0.1f);
 

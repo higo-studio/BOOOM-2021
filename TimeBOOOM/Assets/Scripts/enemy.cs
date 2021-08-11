@@ -12,9 +12,13 @@ public class enemy : MonoBehaviour
     bool Immune = false;
     GameObject ps1, ps2; //Á£×ÓÏµÍ³
     public GameObject exp;
+    AudioSource audioSource;
+    public AudioClip danamgeSFX;
+    public AudioClip shootSFX;
 
     private void Awake()
     {
+        audioSource = GetComponent<AudioSource>();
         heart1 = enemyHPUI.transform.GetChild(1).gameObject;
         heart2 = enemyHPUI.transform.GetChild(2).gameObject;
         heart3 = enemyHPUI.transform.GetChild(3).gameObject;
@@ -22,7 +26,7 @@ public class enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InvokeRepeating("shoot",3,0.2f);
+        InvokeRepeating("shoot",Random.Range(3f,4f),0.2f);
         ps1 = transform.GetChild(0).gameObject;
         ps2 = transform.GetChild(1).gameObject;
     }
@@ -43,6 +47,8 @@ public class enemy : MonoBehaviour
         if (!Immune)
         {
             GameObject bulletcClone;
+            audioSource.clip = shootSFX;
+            audioSource.Play();
             bulletcClone = Instantiate(bullet,
                 transform.position +
                 transform.TransformDirection(Vector3.forward),
@@ -57,6 +63,8 @@ public class enemy : MonoBehaviour
     {
         if (!Immune)
         {
+            audioSource.clip = danamgeSFX;
+            audioSource.Play();
             Immune = true;
             Invoke("Evocation", 3);
             ps1.GetComponent<ParticleSystem>().Play();
@@ -71,7 +79,7 @@ public class enemy : MonoBehaviour
                 heart1.SetActive(false);
                 var expPS = Instantiate(exp, transform.position, transform.rotation);
                 expPS.GetComponent<ParticleSystem>().collision.AddPlane(GameObject.Find("Plane").transform);
-
+                enemyHPUI.SetActive(false);
                 Destroy(gameObject);
             }
         }
