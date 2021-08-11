@@ -5,13 +5,19 @@ using UnityEngine.SceneManagement;
 
 public class Death : MonoBehaviour
 {
-    // Update is called once per frame
+    bool ready = false;
+
     void Update()
     {
-        if (Input.anyKeyDown)
+        if (ready && Input.anyKeyDown)
         {
             Time.timeScale = 1;
             SceneManager.LoadScene(0);
         }
+    }
+
+    public void ready2Restart()
+    {
+        ready = true;
     }
 }

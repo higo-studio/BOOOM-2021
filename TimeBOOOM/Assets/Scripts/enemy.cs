@@ -9,6 +9,9 @@ public class enemy : MonoBehaviour
     public int enemyHP = 3;
     public GameObject enemyHPUI;
     GameObject heart1, heart2, heart3;
+    bool Immune = false;
+    GameObject ps1, ps2; //Á£×ÓÏµÍ³
+    public GameObject exp;
 
     private void Awake()
     {
@@ -20,41 +23,63 @@ public class enemy : MonoBehaviour
     void Start()
     {
         InvokeRepeating("shoot",3,0.2f);
+        ps1 = transform.GetChild(0).gameObject;
+        ps2 = transform.GetChild(1).gameObject;
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.LookAt(new Vector3(player.transform.position.x,
-                                    1, 
-                                    player.transform.position.z));
+        if (!Immune)
+        {
+            transform.LookAt(new Vector3(player.transform.position.x,
+                            1,
+                            player.transform.position.z));
+        }
     }
 
     private void shoot()
     {
-        GameObject bulletcClone;
-        bulletcClone = Instantiate(bullet,
-            transform.position + 
-            transform.TransformDirection(Vector3.forward), 
-            transform.rotation);
-        bulletcClone.GetComponent<Rigidbody>().velocity = 
-            transform.TransformDirection(Vector3.forward * 
-            bullet.GetComponent<bullet>().speed);
+        if (!Immune)
+        {
+            GameObject bulletcClone;
+            bulletcClone = Instantiate(bullet,
+                transform.position +
+                transform.TransformDirection(Vector3.forward),
+                transform.rotation);
+            bulletcClone.GetComponent<Rigidbody>().velocity =
+                transform.TransformDirection(Vector3.forward *
+                bullet.GetComponent<bullet>().speed);
+        }
     }
 
     public void hurt()
     {
-        enemyHP -= 1;
-        if (enemyHP == 2)
-            heart3.SetActive(false);
-        if (enemyHP == 1)
-            heart2.SetActive(false);
-        if (enemyHP == 0)
+        if (!Immune)
         {
-            heart1.SetActive(false);
-            Destroy(gameObject);
-        }
-            
+            Immune = true;
+            Invoke("Evocation", 3);
+            ps1.GetComponent<ParticleSystem>().Play();
+            ps2.GetComponent<ParticleSystem>().Play();
+            enemyHP -= 1;
+            if (enemyHP == 2)
+                heart3.SetActive(false);
+            if (enemyHP == 1)
+                heart2.SetActive(false);
+            if (enemyHP == 0)
+            {
+                heart1.SetActive(false);
+                var expPS = Instantiate(exp, transform.position, transform.rotation);
+                expPS.GetComponent<ParticleSystem>().collision.AddPlane(GameObject.Find("Plane").transform);
 
+                Destroy(gameObject);
+            }
+        }
+    }
+    public void Evocation()
+    {
+        ps1.GetComponent<ParticleSystem>().Stop();
+        ps2.GetComponent<ParticleSystem>().Stop();
+        Immune = false;
     }
 }

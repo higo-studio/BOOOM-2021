@@ -23,13 +23,14 @@ public class bullet : MonoBehaviour
                 collision.transform.GetComponent<player>().hp -= damage;
                 collision.transform.GetComponent<player>().updatePlayerHPInfo();
                 ContactPoint contact = collision.contacts[0];               
-                Instantiate(blood,contact.point,Quaternion.FromToRotation(Vector3.forward,contact.normal));
+                Instantiate(blood, contact.point, Quaternion.FromToRotation(Vector3.forward, contact.normal));
+                Instantiate(blood, contact.point, Quaternion.FromToRotation(Vector3.back, contact.normal));
                 Destroy(gameObject);
             }                   
         }
         if (collision.transform.tag == "Enemy")
         {
-            UnityEngine.Debug.Log("击中敌人");
+            //UnityEngine.Debug.Log("击中敌人");
             collision.transform.GetComponent<enemy>().hurt();
             ContactPoint contact = collision.contacts[0];
             Instantiate(bloodE, contact.point, Quaternion.FromToRotation(Vector3.forward, contact.normal));

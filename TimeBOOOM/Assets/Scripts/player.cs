@@ -50,8 +50,10 @@ public class player : MonoBehaviour
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Physics.Raycast(ray,out hit);
-        transform.LookAt(new Vector3(hit.point.x, 1, hit.point.z));
-        
+        if (hit.transform != null && hit.transform.tag != "Player")
+        {
+            transform.LookAt(new Vector3(hit.point.x, 1, hit.point.z));
+        }      
 
         if(alive)
         {
