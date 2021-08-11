@@ -1,5 +1,6 @@
 using Unity.Entities;
 using UnityEngine;
+using Unity.Mathematics;
 
 [GenerateAuthoringComponent]
 public struct SpaceMapComp : IComponentData
@@ -10,12 +11,11 @@ public struct SpaceMapComp : IComponentData
     public uint cubeSize;
 }
 
-public struct BlockEntityBuffer : IBufferElementData
-{
-    Entity entity;
-}
-
 public struct SpaceMapStateComp : ISystemStateComponentData
 {
+}
 
+public struct SpaceMapTileComp : IBufferElementData {
+    public uint x;
+    public uint y;
 }

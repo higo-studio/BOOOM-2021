@@ -1,4 +1,4 @@
-﻿using Unity.Burst;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
@@ -7,25 +7,38 @@ using Unity.Transforms;
 
 public class SpaceMapInitSys : SystemBase
 {
-    public EntityArchetype blockArchetype;
     protected override void OnCreate()
     {
         base.OnCreate();
-        blockArchetype = EntityManager.CreateArchetype(
-            typeof(BlockStateComp)
-        );
+
     }
     protected override void OnUpdate()
     {
-        Entities.WithNone<SpaceMapStateComp>().ForEach((Entity entity, ref BlockEntityBuffer blockBuffer, in SpaceMapComp map) =>
+        var blockArchetype = EntityManager.CreateArchetype(
+            typeof(BlockStateComp),
+            typeof(Parent),
+            typeof(Translation)
+        );
+
+        Entities.WithNone<SpaceMapStateComp>().ForEach((Entity e, SpaceMapComp space) =>
         {
-            for(var i = 0; i < 10; i++)
+            var buffer = EntityManager.AddBuffer<SpaceMapTileComp>(e);
+            buffer.ResizeUninitialized((int)(space.width * space.height));
+            for (uint i = 0; i < space.width; i++)
             {
-                var ent = EntityManager.CreateEntity(blockArchetype);
-                
+                for (uint j = 0; j < space.height; j++)
+                {
+                    var idx = (int)(i * space.height + j);
+                    var tile = buffer[idx];
+                    tile.x = i;
+                    tile.y = j;
+                    buffer[idx] = tile;
+                }
             }
-            EntityManager.AddComponentData(entity, new SpaceMapStateComp());
-        });
+
+            EntityManager.AddComponent<SpaceMapStateComp>(e);
+        }).WithStructuralChanges().Run();
+
     }
 }
 
