@@ -7,7 +7,7 @@
         {
             "name": "Unity Editor",
             "type": "unity",
-            "path": "/D:/lib/BOOOM-2021/Library/EditorInstance.json",
+            "path": "/f:/lib/BOOOM-2021/Library/EditorInstance.json",
             "request": "launch"
         },
         {

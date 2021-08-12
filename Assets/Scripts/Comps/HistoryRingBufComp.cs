@@ -2,9 +2,9 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
-public struct HistoryEleComp : IBufferElementData
+public struct HistoryInputEleComp : IBufferElementData
 {
-    public float3 pos;
+    public SingletonInputComp input;
     public double timestamp;
 }
 
@@ -19,14 +19,6 @@ public struct HistoryRingBufComp : IComponentData
     // public int samplePerSec;
     [HideInInspector]
     public double sampleAccumulator;
-
-#if UNITY_EDITOR
-    public int length;
-    public void DebugLength()
-    {
-        length = Length;
-    }
-#endif
 
     public void UseDefault()
     {
