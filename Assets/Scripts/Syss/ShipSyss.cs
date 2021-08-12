@@ -1,11 +1,14 @@
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
+using UnityEngine;
 
+[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public class MovableSys : SystemBase
 {
     protected override void OnUpdate()
     {
+        Debug.Log(Time.DeltaTime);
         var dt = Time.DeltaTime;
         Entities.ForEach((ref LogicTrsComp t, in VelocityComp v) =>
         {
@@ -14,6 +17,7 @@ public class MovableSys : SystemBase
     }
 }
 
+[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 [UpdateAfter(typeof(MovableSys))]
 public class RecordPosPreSec : SystemBase
 {
@@ -52,6 +56,7 @@ public class RecordPosPreSec : SystemBase
 }
 
 [UpdateAfter(typeof(RecordPosPreSec))]
+[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public class HistoryPosRenderSys : SystemBase
 {
     protected override void OnCreate()
@@ -70,7 +75,7 @@ public class HistoryPosRenderSys : SystemBase
             {
                 var bufIdx = ring[i];
                 var history = historyBuffer[bufIdx];
-                if (history.timestamp + math.length(cameraTrs.Value - history.pos) / 1 > timestamp)
+                if (history.timestamp + math.length(cameraTrs.Value - history.pos) / 10 > timestamp)
                 {
                     break;
                 }

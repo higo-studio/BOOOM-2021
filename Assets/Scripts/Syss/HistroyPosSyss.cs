@@ -1,6 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
+[UpdateInGroup(typeof(InitializationSystemGroup ))]
 public class HistoryPosInitSys : SystemBase
 {
     protected override void OnUpdate()

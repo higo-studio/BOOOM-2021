@@ -10,6 +10,11 @@ public struct SingletonVarComp : IComponentData
 [UpdateInGroup(typeof(GameObjectConversionGroup))]
 public class SingletonConversionSys : GameObjectConversionSystem
 {
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+        DstEntityManager.World.GetOrCreateSystem<FixedStepSimulationSystemGroup>().Timestep = 1f;
+    }
     protected override void OnUpdate()
     {
         var singletonEnt = DstEntityManager.CreateEntity(typeof(SingletonVarComp));

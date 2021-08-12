@@ -20,7 +20,7 @@ public class SpaceMapInitSys : SystemBase
             typeof(Translation)
         );
 
-        Entities.WithNone<SpaceMapStateComp>().ForEach((Entity e, SpaceMapComp space) =>
+        Entities.WithNone<SpaceMapStateComp>().ForEach((Entity e, in SpaceMapComp space) =>
         {
             var buffer = EntityManager.AddBuffer<SpaceMapTileComp>(e);
             buffer.ResizeUninitialized((int)(space.width * space.height));
