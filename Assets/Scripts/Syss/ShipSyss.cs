@@ -28,7 +28,7 @@ public class RecordPosPreSec : SystemBase
         Entities.ForEach((ref DynamicBuffer<HistoryEleComp> posBuffer, ref HistoryRingBufComp ring, in LogicTrsComp t) =>
         {
             ring.sampleAccumulator += dt;
-            var requiredDt = (1d / ring.samplePerSec);
+            var requiredDt = (1d / dt);
             if (ring.sampleAccumulator < requiredDt)
             {
                 return;

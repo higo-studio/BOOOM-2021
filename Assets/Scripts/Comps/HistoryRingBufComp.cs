@@ -15,8 +15,8 @@ public struct HistoryRingBufComp : IComponentData
     public int bufferOpacityPlusOne => bufferOpacity + 1;
     public int end;
     public int start;
-    [Range(1, 60)]
-    public int samplePerSec;
+    // [Range(1, 60)]
+    // public int samplePerSec;
     [HideInInspector]
     public double sampleAccumulator;
 
