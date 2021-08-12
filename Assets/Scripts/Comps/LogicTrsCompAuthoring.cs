@@ -10,7 +10,7 @@ public class LogicTrsCompAuthoring : MonoBehaviour, IConvertGameObjectToEntity
         var pos = transform.position;
         dstManager.AddComponentData(entity, new LogicTrsComp()
         {
-            pos = pos
+            pos = pos,
         });
     }
 }

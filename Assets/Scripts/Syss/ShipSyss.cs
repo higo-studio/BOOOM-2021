@@ -14,28 +14,68 @@ public class MovableSys : SystemBase
     }
 }
 
-public class ShipRenderSys : SystemBase
+[UpdateAfter(typeof(MovableSys))]
+public class RecordPosPreSec : SystemBase
 {
     protected override void OnUpdate()
     {
-        Entities.ForEach((ref Translation tt, in LogicTrsComp t) =>
+        var curTime = Time.ElapsedTime;
+        var dt = Time.DeltaTime;
+        Entities.ForEach((ref DynamicBuffer<HistoryEleComp> posBuffer, ref HistoryRingBufComp ring, in LogicTrsComp t) =>
         {
-            tt.Value = t.pos;
+            ring.sampleAccumulator += dt;
+            var requiredDt = (1d / ring.samplePerSec);
+            if (ring.sampleAccumulator < requiredDt)
+            {
+                return;
+            }
+
+            ring.sampleAccumulator -= requiredDt;
+
+            if (ring.IsFull)
+            {
+                ring.Shift(out var _);
+            }
+            if (ring.Push(out var idx))
+            {
+                posBuffer[idx] = new HistoryEleComp()
+                {
+                    pos = t.pos,
+                    timestamp = curTime
+                };
+            }
+#if UNITY_EDITOR
+            ring.DebugLength();
+#endif
         }).ScheduleParallel();
     }
 }
 
-[UpdateAfter(typeof(ShipRenderSys))]
-public class RecordShipPosPreSec : SystemBase
+[UpdateAfter(typeof(RecordPosPreSec))]
+public class HistoryPosRenderSys : SystemBase
 {
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+        RequireSingletonForUpdate<SingletonVarComp>();
+    }
     protected override void OnUpdate()
     {
-        Entities.ForEach((ref DynamicBuffer<HistoryPosComp> posBuffer, in LogicTrsComp t) =>
+        var timestamp = Time.ElapsedTime;
+        var gVar = GetSingleton<SingletonVarComp>();
+        var cameraTrs = EntityManager.GetComponentData<Translation>(gVar.mainCamera);
+        Entities.ForEach((ref Translation tt, ref HistoryRingBufComp ring, in DynamicBuffer<HistoryEleComp> historyBuffer) =>
         {
-            posBuffer.Add(new HistoryPosComp()
+            for (var i = 0; i < ring.Length; i++)
             {
-                pos = t.pos
-            });
-        }).ScheduleParallel();
+                var bufIdx = ring[i];
+                var history = historyBuffer[bufIdx];
+                if (history.timestamp + math.length(cameraTrs.Value - history.pos) / 1 > timestamp)
+                {
+                    break;
+                }
+                tt.Value = history.pos;
+            }
+        }).Schedule();
     }
 }
