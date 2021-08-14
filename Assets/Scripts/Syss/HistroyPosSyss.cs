@@ -22,13 +22,13 @@ public class RecordInputSys : SystemBase
     protected override void OnCreate()
     {
         base.OnCreate();
-        RequireSingletonForUpdate<SingletonInputComp>();
+        RequireSingletonForUpdate<CharacterControllerInput>();
     }
     protected override void OnUpdate()
     {
         var curTime = Time.ElapsedTime;
         var dt = Time.DeltaTime;
-        var input = GetSingleton<SingletonInputComp>();
+        var input = GetSingleton<CharacterControllerInput>();
         Entities.ForEach((ref DynamicBuffer<HistoryInputEleComp> posBuffer, ref HistoryRingBufComp ring, in Translation t) =>
         {
             ring.sampleAccumulator += dt;

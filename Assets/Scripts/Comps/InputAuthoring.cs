@@ -1,25 +1,20 @@
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using Unity.Physics;
 
 public class InputAuthoring : MonoBehaviour
 {
-    SingletonInputComp sInput = new SingletonInputComp();
-    private void FixedUpdate()
+    CharacterControllerInput sInput = new CharacterControllerInput();
+    private void Update()
     {
         var sys = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SimulationSystemGroup>();
-        sInput.HorizontalAxis = Input.GetAxis("Horizontal");
-        sInput.VerticalAxis = Input.GetAxis("Vertical");
-        sInput.Jump = Input.GetButtonDown("Jump");
+        sInput.Movement.x = Input.GetAxisRaw("Horizontal");
+        sInput.Movement.y = Input.GetAxisRaw("Vertical");
+        sInput.Jumped = Input.GetButton("Jump") ? 1 : 0;
         sys.SetSingleton(sInput);
+        
     }
-}
-
-public struct SingletonInputComp : IComponentData
-{
-    public float HorizontalAxis;
-    public float VerticalAxis;
-    public bool Jump;
 }
 
 public struct SingletonVarComp : IComponentData
@@ -33,11 +28,11 @@ public class SingletonConversionSys : GameObjectConversionSystem
     protected override void OnCreate()
     {
         base.OnCreate();
-        DstEntityManager.World.GetOrCreateSystem<FixedStepSimulationSystemGroup>().Timestep = 0.2f;
+        // DstEntityManager.World.GetOrCreateSystem<FixedStepSimulationSystemGroup>().Timestep = 0.2f;
     }
     protected override void OnUpdate()
     {
-        var singletonEnt = DstEntityManager.CreateEntity(typeof(SingletonVarComp), typeof(SingletonInputComp));
+        var singletonEnt = DstEntityManager.CreateEntity(typeof(SingletonVarComp), typeof(CharacterControllerInput));
         DstEntityManager.SetName(singletonEnt, "Singeton Entity");
 
         Entities.ForEach((Camera camera) =>
@@ -47,7 +42,7 @@ public class SingletonConversionSys : GameObjectConversionSystem
             {
                 mainCamera = ent
             });
-            DstEntityManager.SetComponentData(singletonEnt, new SingletonInputComp());
+            DstEntityManager.SetComponentData(singletonEnt, new CharacterControllerInput());
         });
     }
 }

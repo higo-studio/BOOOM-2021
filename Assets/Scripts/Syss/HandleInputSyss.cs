@@ -1,6 +1,8 @@
 using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
+using Unity.Physics;
+using Unity.Physics.Extensions;
 
 [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
 public class HandleInputSys : SystemBase
@@ -8,16 +10,15 @@ public class HandleInputSys : SystemBase
     protected override void OnCreate()
     {
         base.OnCreate();
-        RequireSingletonForUpdate<SingletonInputComp>();
+        RequireSingletonForUpdate<CharacterControllerInput>();
     }
     protected override void OnUpdate()
     {
         var time = Time.DeltaTime;
-        var input = GetSingleton<SingletonInputComp>();
-        Entities.ForEach((ref Translation t, in VelocityComp vec) =>
+        var input = GetSingleton<CharacterControllerInput>();
+        Entities.WithBurst().WithAll<ReceiveInputComp>().ForEach((ref CharacterControllerInternalData internalInput) =>
         {
-            t.Value.x += vec.Value.x * time * input.HorizontalAxis;
-            t.Value.z += vec.Value.y * time * input.VerticalAxis;
+            internalInput.Input = input;
         }).Schedule();
     }
 }

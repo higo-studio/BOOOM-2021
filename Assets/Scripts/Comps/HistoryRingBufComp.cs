@@ -4,7 +4,7 @@ using UnityEngine;
 
 public struct HistoryInputEleComp : IBufferElementData
 {
-    public SingletonInputComp input;
+    public CharacterControllerInput input;
     public double timestamp;
 }
 
