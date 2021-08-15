@@ -36,7 +36,8 @@ public struct CharacterControllerComponentData : IComponentData
 public struct CharacterControllerInput : IComponentData
 {
     public float2 Movement;
-    public float2 Looking;
+    public Space MovementSpace;
+    public float3 PointLookAt;
     public int Jumped;
 }
 
@@ -44,7 +45,8 @@ public struct CharacterControllerInput : IComponentData
 [WriteGroup(typeof(PhysicsGraphicalSmoothing))]
 public struct CharacterControllerInternalData : IComponentData
 {
-    public float CurrentRotationAngle;
+    // public float CurrentRotationAngle;
+    public quaternion Rotation;
     public CharacterSupportState SupportedState;
     public float3 UnsupportedVelocity;
     public PhysicsVelocity Velocity;
@@ -97,7 +99,7 @@ public class CharacterControllerAuthoring : MonoBehaviour, IConvertGameObjectToE
     // Whether to raise trigger events
     public bool RaiseTriggerEvents = false;
 
-    void OnEnable() {}
+    void OnEnable() { }
 
     void IConvertGameObjectToEntity.Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
@@ -123,6 +125,7 @@ public class CharacterControllerAuthoring : MonoBehaviour, IConvertGameObjectToE
             {
                 Entity = entity,
                 Input = new CharacterControllerInput(),
+                Rotation = quaternion.identity
             };
 
             dstManager.AddComponentData(entity, componentData);
@@ -134,7 +137,7 @@ public class CharacterControllerAuthoring : MonoBehaviour, IConvertGameObjectToE
             if (RaiseTriggerEvents)
             {
                 dstManager.AddBuffer<StatefulTriggerEvent>(entity);
-                dstManager.AddComponentData(entity, new ExcludeFromTriggerEventConversion {});
+                dstManager.AddComponentData(entity, new ExcludeFromTriggerEventConversion { });
             }
         }
     }
@@ -268,7 +271,9 @@ public class CharacterControllerSystem : SystemBase
                 CheckSupport(ref PhysicsWorld, ref collider, stepInput, transform,
                     out ccInternalData.SupportedState, out float3 surfaceNormal, out float3 surfaceVelocity,
                     currentFrameCollisionEvents);
-
+                
+                var lookAt = ccInternalData.Input.PointLookAt - position.Value;
+                ccInternalData.Rotation = quaternion.LookRotation(lookAt - math.project(lookAt, Vector3.up), math.up());
                 // User input
                 float3 desiredVelocity = ccInternalData.Velocity.Linear;
                 HandleUserInput(ccComponentData, stepInput.Up, surfaceVelocity, ref ccInternalData, ref desiredVelocity);
@@ -276,7 +281,7 @@ public class CharacterControllerSystem : SystemBase
                 // Calculate actual velocity with respect to surface
                 if (ccInternalData.SupportedState == CharacterSupportState.Supported)
                 {
-                    CalculateMovement(ccInternalData.CurrentRotationAngle, stepInput.Up, ccInternalData.IsJumping,
+                    CalculateMovement(ccInternalData.Rotation, stepInput.Up, ccInternalData.IsJumping,
                         ccInternalData.Velocity.Linear, desiredVelocity, surfaceNormal, surfaceVelocity, out ccInternalData.Velocity.Linear);
                 }
                 else
@@ -302,7 +307,7 @@ public class CharacterControllerSystem : SystemBase
 
                 // Write back and orientation integration
                 position.Value = transform.pos;
-                rotation.Value = quaternion.AxisAngle(up, ccInternalData.CurrentRotationAngle);
+                rotation.Value = ccInternalData.Rotation;
 
                 // Write back to chunk data
                 {
@@ -340,27 +345,34 @@ public class CharacterControllerSystem : SystemBase
                 if (haveInput)
                 {
                     float3 localSpaceMovement = forward * vertical + right * horizontal;
-                    float3 worldSpaceMovement = math.rotate(quaternion.AxisAngle(up, ccInternalData.CurrentRotationAngle), localSpaceMovement);
-                    requestedMovementDirection = math.normalize(worldSpaceMovement);
+                    if (ccInternalData.Input.MovementSpace == Space.Self)
+                    {
+                        float3 worldSpaceMovement = math.rotate(ccInternalData.Rotation, localSpaceMovement);
+                        requestedMovementDirection = math.normalize(worldSpaceMovement);
+                    }
+                    else
+                    {
+                        requestedMovementDirection = math.normalize(localSpaceMovement);
+                    }
                 }
                 shouldJump = jumpRequested && ccInternalData.SupportedState == CharacterSupportState.Supported;
             }
 
             // Turning
-            {
-                float horizontal = ccInternalData.Input.Looking.x;
-                bool haveInput = (math.abs(horizontal) > float.Epsilon);
-                if (haveInput)
-                {
-                    var userRotationSpeed = horizontal * ccComponentData.RotationSpeed;
-                    ccInternalData.Velocity.Angular = -userRotationSpeed * up;
-                    ccInternalData.CurrentRotationAngle += userRotationSpeed * DeltaTime;
-                }
-                else
-                {
-                    ccInternalData.Velocity.Angular = 0f;
-                }
-            }
+            // {
+            //     float horizontal = ccInternalData.Input.Looking.x;
+            //     bool haveInput = (math.abs(horizontal) > float.Epsilon);
+            //     if (haveInput)
+            //     {
+            //         var userRotationSpeed = horizontal * ccComponentData.RotationSpeed;
+            //         ccInternalData.Velocity.Angular = -userRotationSpeed * up;
+            //         ccInternalData.CurrentRotationAngle += userRotationSpeed * DeltaTime;
+            //     }
+            //     else
+            //     {
+            //         ccInternalData.Velocity.Angular = 0f;
+            //     }
+            // }
 
             // Apply input velocities
             {
@@ -382,10 +394,10 @@ public class CharacterControllerSystem : SystemBase
             }
         }
 
-        private void CalculateMovement(float currentRotationAngle, float3 up, bool isJumping,
+        private void CalculateMovement(quaternion rotation, float3 up, bool isJumping,
             float3 currentVelocity, float3 desiredVelocity, float3 surfaceNormal, float3 surfaceVelocity, out float3 linearVelocity)
         {
-            float3 forward = math.forward(quaternion.AxisAngle(up, currentRotationAngle));
+            float3 forward = math.forward(rotation);
 
             Rotation surfaceFrame;
             float3 binorm;

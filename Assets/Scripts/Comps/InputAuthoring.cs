@@ -5,7 +5,11 @@ using Unity.Physics;
 
 public class InputAuthoring : MonoBehaviour
 {
+    public Camera mainCamera;
+    public Transform plant;
     CharacterControllerInput sInput = new CharacterControllerInput();
+    public Transform flag;
+    public Space MovementSpace;
     private void Update()
     {
         var sys = World.DefaultGameObjectInjectionWorld.GetExistingSystem<SimulationSystemGroup>();
@@ -13,7 +17,29 @@ public class InputAuthoring : MonoBehaviour
         sInput.Movement.y = Input.GetAxisRaw("Vertical");
         sInput.Jumped = Input.GetButton("Jump") ? 1 : 0;
         sys.SetSingleton(sInput);
-        
+        if (mainCamera)
+        {
+            var mousePos = Input.mousePosition;
+            var mouseWordPos = mainCamera.ScreenToWorldPoint(new Vector3()
+            {
+                x = mousePos.x,
+                y = mousePos.y,
+                z = 10
+            });
+            var mouseOnPlantPoint = GameUtils.CalculateLineSurfacePoint(
+                mainCamera.transform.position,
+                mouseWordPos - mainCamera.transform.position,
+                plant.position,
+                Vector3.up
+            );
+            Debug.DrawLine(mainCamera.transform.position, mouseOnPlantPoint, Color.red);
+            if (flag)
+            {
+                flag.position = mouseOnPlantPoint;
+            }
+            sInput.MovementSpace = MovementSpace;
+            sInput.PointLookAt = mouseOnPlantPoint;
+        }
     }
 }
 
