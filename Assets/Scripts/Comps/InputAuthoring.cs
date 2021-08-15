@@ -41,7 +41,7 @@ public class InputAuthoring : MonoBehaviour
             sInput.PointLookAt = mouseOnPlantPoint;
         }
 
-        sInput.IsFire = Input.GetButton("Fire1");
+        sInput.Firing = Input.GetButton("Fire1");
     }
 }
 
