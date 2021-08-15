@@ -39,6 +39,7 @@ public struct CharacterControllerInput : IComponentData
     public Space MovementSpace;
     public float3 PointLookAt;
     public int Jumped;
+    public bool IsFire;
 }
 
 [WriteGroup(typeof(PhysicsGraphicalInterpolationBuffer))]

@@ -32,7 +32,7 @@ public class RecordInputSys : SystemBase
         Entities.ForEach((ref DynamicBuffer<HistoryInputEleComp> posBuffer, ref HistoryRingBufComp ring, in Translation t) =>
         {
             ring.sampleAccumulator += dt;
-            var requiredDt = (1d / dt);
+            var requiredDt = dt;
             if (ring.sampleAccumulator < requiredDt)
             {
                 return;
@@ -52,6 +52,7 @@ public class RecordInputSys : SystemBase
                     timestamp = curTime
                 };
             }
-        }).ScheduleParallel();
+        // }).ScheduleParallel();
+        }).Run();
     }
 }
