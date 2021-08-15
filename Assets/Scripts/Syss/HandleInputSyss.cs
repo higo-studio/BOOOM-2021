@@ -42,7 +42,7 @@ public class InputHistoryInitSys : SystemBase
         {
             mng.AddComponentData(e, new HistoryRingBufComp()
             {
-                bufferOpacity = (int)math.ceil(receivInputComp.delay * 60 + 1)
+                bufferOpacity = (int)math.ceil(receivInputComp.delay * 60) + 1
             });
         }).WithStructuralChanges().Run();
     }
